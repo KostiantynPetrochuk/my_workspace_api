@@ -18,7 +18,7 @@ const handleRefreshToken = async (req, res) => {
       async (err, decoded) => {
         if (err) return res.sendStatus(403); // Forbidden
         const hackedUser = await User.findOne({
-          username: decoded.username,
+          email: decoded.email,
         }).exec();
         hackedUser.refreshToken = [];
         const result = await hackedUser.save();
@@ -39,7 +39,7 @@ const handleRefreshToken = async (req, res) => {
         foundUser.refreshToken = [...newRefreshTokenArray];
         const result = await foundUser.save();
       }
-      if (err || foundUser.username !== decoded.username) {
+      if (err || foundUser.email !== decoded.email) {
         return res.sendStatus(403);
       }
 
@@ -47,7 +47,7 @@ const handleRefreshToken = async (req, res) => {
       const accessToken = jwt.sign(
         {
           UserInfo: {
-            username: decoded.username,
+            email: decoded.email,
             roles: roles,
           },
         },
@@ -56,7 +56,7 @@ const handleRefreshToken = async (req, res) => {
       );
 
       const newRefreshToken = jwt.sign(
-        { username: foundUser.username },
+        { email: foundUser.email },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: "1d" }
       );
