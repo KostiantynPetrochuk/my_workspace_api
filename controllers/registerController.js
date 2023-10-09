@@ -14,18 +14,13 @@ const handleNewUser = async (req, res) => {
   if (duplicate) return res.sendStatus(409); // Conflict
 
   try {
-    const hashedPwd = await bcrypt.hash(pwd, 10);
-
-    const refreshToken = jwt.sign({ email }, process.env.REFRESH_TOKEN_SECRET, {
-      expiresIn: "1d",
-    });
+    const hashPwd = await bcrypt.hash(pwd, 10);
 
     const result = await User.create({
       firstName,
       lastName,
       email,
-      password: hashedPwd,
-      refreshToken: [refreshToken],
+      hashPwd,
     });
 
     const roles = Object.values(result.roles).filter(Boolean);

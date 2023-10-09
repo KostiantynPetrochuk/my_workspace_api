@@ -13,7 +13,7 @@ const handleLogin = async (req, res) => {
 
   const foundUser = await User.findOne({ email }).exec();
   if (!foundUser) return res.sendStatus(401); // Unauthorized
-  const match = await bcrypt.compare(pwd, foundUser.password);
+  const match = await bcrypt.compare(pwd, foundUser.hashPwd);
   if (match) {
     const roles = Object.values(foundUser.roles).filter(Boolean);
     const accessToken = jwt.sign(

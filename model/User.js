@@ -21,11 +21,11 @@ const userSchema = new Schema({
     },
     Admin: Number,
   },
-  password: {
+  hashPwd: {
     type: String,
     required: true,
   },
-  refreshToken: { type: [String] },
+  refreshToken: { type: [String], default: [] },
 });
 
 module.exports = mongoose.model("User", userSchema);
