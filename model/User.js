@@ -14,6 +14,10 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  surrName: {
+    type: String,
+    required: true,
+  },
   roles: {
     User: {
       type: Number,

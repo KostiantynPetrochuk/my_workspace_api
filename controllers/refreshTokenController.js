@@ -71,7 +71,14 @@ const handleRefreshToken = async (req, res) => {
         maxAge: 24 * 60 * 60 * 1000,
       });
 
-      res.json({ roles: roles, accessToken });
+      res.json({
+        userId: foundUser._id,
+        roles: roles,
+        accessToken,
+        firstName: foundUser.firstName,
+        lastName: foundUser.lastName,
+        surrName: foundUser.surrName,
+      });
     }
   );
 };

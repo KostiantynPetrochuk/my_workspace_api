@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const handleNewUser = async (req, res) => {
-  const { firstName, lastName, email, pwd } = req.body;
+  const { firstName, lastName, surrName, email, pwd } = req.body;
   if (!email || !pwd) {
     return res
       .status(400)
@@ -19,6 +19,7 @@ const handleNewUser = async (req, res) => {
     const result = await User.create({
       firstName,
       lastName,
+      surrName,
       email,
       hashPwd,
     });
@@ -36,7 +37,16 @@ const handleNewUser = async (req, res) => {
       { expiresIn: "10s" }
     );
 
-    res.status(201).json({ roles, accessToken });
+    res
+      .status(201)
+      .json({
+        userId: result._id,
+        roles,
+        accessToken,
+        firstName,
+        lastName,
+        surrName,
+      });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: err.message });
