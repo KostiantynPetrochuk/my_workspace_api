@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const { ObjectId } = Schema;
 
 const userSchema = new Schema({
   email: {
@@ -30,6 +31,7 @@ const userSchema = new Schema({
     required: true,
   },
   refreshToken: { type: [String], default: [] },
+  lastTimeLogId: ObjectId,
 });
 
 module.exports = mongoose.model("User", userSchema);

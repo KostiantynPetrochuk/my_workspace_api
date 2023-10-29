@@ -29,6 +29,7 @@ const handleNewUser = async (req, res) => {
     const accessToken = jwt.sign(
       {
         UserInfo: {
+          id: foundUser._id,
           email,
           roles: roles,
         },
@@ -37,16 +38,14 @@ const handleNewUser = async (req, res) => {
       { expiresIn: "10s" }
     );
 
-    res
-      .status(201)
-      .json({
-        userId: result._id,
-        roles,
-        accessToken,
-        firstName,
-        lastName,
-        surrName,
-      });
+    res.status(201).json({
+      userId: result._id,
+      roles,
+      accessToken,
+      firstName,
+      lastName,
+      surrName,
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: err.message });

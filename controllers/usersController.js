@@ -1,8 +1,16 @@
 const User = require("../model/User");
+const ROLES_LIST = require("../config/rolesList");
 
 const getAllUsers = async (req, res) => {
-  const users = await User.find();
+  const adminOnly = req.user.roles.includes(ROLES_LIST.Admin);
+  const find = {};
+  if (!adminOnly) {
+    find._id = req.user.id;
+  }
+
+  const users = await User.find(find);
   if (!users) return res.status(204).json({ message: "No users found" });
+
   res.json(users);
 };
 
