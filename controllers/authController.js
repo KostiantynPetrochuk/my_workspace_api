@@ -15,17 +15,16 @@ const handleLogin = async (req, res) => {
   if (!foundUser) return res.sendStatus(401); // Unauthorized
   const match = await bcrypt.compare(pwd, foundUser.hashPwd);
   if (match) {
-    const roles = Object.values(foundUser.roles).filter(Boolean);
     const accessToken = jwt.sign(
       {
         UserInfo: {
           id: foundUser._id,
           email: foundUser.email,
-          roles: roles,
+          roles: foundUser.roles,
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "10s" }
+      { expiresIn: "15m" }
     );
     const newRefreshToken = jwt.sign(
       { email: foundUser.email },
@@ -64,7 +63,7 @@ const handleLogin = async (req, res) => {
 
     res.json({
       userId: foundUser._id,
-      roles,
+      roles: foundUser.roles,
       accessToken,
       firstName: foundUser.firstName,
       lastName: foundUser.lastName,

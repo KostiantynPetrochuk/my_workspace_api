@@ -24,23 +24,21 @@ const handleNewUser = async (req, res) => {
       hashPwd,
     });
 
-    const roles = Object.values(result.roles).filter(Boolean);
-
     const accessToken = jwt.sign(
       {
         UserInfo: {
           id: foundUser._id,
           email,
-          roles: roles,
+          roles: result.roles,
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "10s" }
+      { expiresIn: "15m" }
     );
 
     res.status(201).json({
       userId: result._id,
-      roles,
+      roles: result.roles,
       accessToken,
       firstName,
       lastName,

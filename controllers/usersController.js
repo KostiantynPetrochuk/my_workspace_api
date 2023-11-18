@@ -1,14 +1,85 @@
+const { ObjectId } = require("mongoose").Types;
 const User = require("../model/User");
 const ROLES_LIST = require("../config/rolesList");
+const { startOfToday, endOfToday } = require("date-fns");
 
 const getAllUsers = async (req, res) => {
+  const startOfTodayTest = startOfToday();
+  const endOfTodayTest = endOfToday();
+
   const adminOnly = req.user.roles.includes(ROLES_LIST.Admin);
   const find = {};
+  const projection = {
+    hashPwd: 0,
+    __v: 0,
+    refreshToken: 0,
+    lastTimeLogId: 0,
+  };
   if (!adminOnly) {
-    find._id = req.user.id;
+    find._id = new ObjectId(req.user.id);
   }
 
-  const users = await User.find(find);
+  const users = await User.aggregate([
+    { $match: find },
+    {
+      $lookup: {
+        from: "userstimelogs",
+        let: { lastTimeLogId: "$lastTimeLogId" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$lastTimeLogId"] },
+              date: {
+                $gte: startOfTodayTest,
+                $lte: endOfTodayTest,
+              },
+            },
+          },
+          {
+            $project: {
+              userId: 0,
+              __v: 0,
+            },
+          },
+        ],
+        as: "lastTimeLog",
+      },
+    },
+    {
+      $lookup: {
+        from: "userstimelogs",
+        let: { userId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$userId", "$$userId"] },
+              date: {
+                $gte: startOfTodayTest,
+                $lte: endOfTodayTest,
+              },
+            },
+          },
+          {
+            $project: {
+              userId: 0,
+              __v: 0,
+            },
+          },
+          {
+            $sort: { date: -1 },
+          },
+        ],
+        as: "timelogsHistory",
+      },
+    },
+    {
+      $addFields: {
+        lastTimeLog: { $arrayElemAt: ["$lastTimeLog", 0] },
+      },
+    },
+    { $project: projection },
+  ]);
+
   if (!users) return res.status(204).json({ message: "No users found" });
 
   res.json(users);
