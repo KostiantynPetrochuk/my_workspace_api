@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const usersTimeLogsController = require("../../controllers/usersTimeLogsController");
+const timeLogsController = require("../../controllers/timeLogsController");
 const ROLES_LIST = require("../../config/rolesList");
 const verifyRoles = require("../../middleware/verifyRoles");
 
 router
   .route("/")
-  .post(verifyRoles(ROLES_LIST.User), usersTimeLogsController.addUserLog);
+  .post(verifyRoles(ROLES_LIST.User), timeLogsController.addUserLog);
 
 module.exports = router;

@@ -23,7 +23,7 @@ const getAllUsers = async (req, res) => {
     { $match: find },
     {
       $lookup: {
-        from: "userstimelogs",
+        from: "timelogs",
         let: { lastTimeLogId: "$lastTimeLogId" },
         pipeline: [
           {
@@ -47,7 +47,7 @@ const getAllUsers = async (req, res) => {
     },
     {
       $lookup: {
-        from: "userstimelogs",
+        from: "timelogs",
         let: { userId: "$_id" },
         pipeline: [
           {

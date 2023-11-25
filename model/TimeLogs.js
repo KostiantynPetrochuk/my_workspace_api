@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { ObjectId } = Schema;
 
-const usersTimeLogsSchema = new Schema(
+const timeLogsSchema = new Schema(
   {
     userId: ObjectId,
     date: Date,
@@ -22,4 +22,4 @@ const usersTimeLogsSchema = new Schema(
   { versionKey: false }
 );
 
-module.exports = mongoose.model("UsersTimeLogs", usersTimeLogsSchema);
+module.exports = mongoose.model("TimeLogs", timeLogsSchema);

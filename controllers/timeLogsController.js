@@ -1,7 +1,7 @@
 const { ObjectId } = require("mongoose").Types;
 const ROLES_LIST = require("../config/rolesList");
 const User = require("../model/User");
-const UsersTimeLogs = require("../model/UsersTimeLogs");
+const TimeLogs = require("../model/TimeLogs");
 
 const { startOfToday, endOfToday, differenceInHours } = require("date-fns");
 
@@ -16,7 +16,7 @@ const addUserLog = async (req, res) => {
   const startTime = startOfToday();
   const endTime = endOfToday();
 
-  const [lastTimeLog] = await UsersTimeLogs.aggregate([
+  const [lastTimeLog] = await TimeLogs.aggregate([
     {
       $match: {
         userId: new ObjectId(targetUserId),
@@ -39,7 +39,7 @@ const addUserLog = async (req, res) => {
 
     const options = { returnOriginal: false, returnDocument: "after" };
 
-    const updatedLog = await UsersTimeLogs.findOneAndUpdate(
+    const updatedLog = await TimeLogs.findOneAndUpdate(
       { _id: new ObjectId(lastTimeLog._id) },
       {
         $set: {
@@ -77,7 +77,7 @@ const addUserLog = async (req, res) => {
       },
     };
 
-    const addedTimeLog = await UsersTimeLogs.create(timeLogBody);
+    const addedTimeLog = await TimeLogs.create(timeLogBody);
     const result = await User.updateOne(
       { _id: new ObjectId(targetUserId) },
       { $set: { lastTimeLogId: addedTimeLog._id } }
