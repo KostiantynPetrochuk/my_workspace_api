@@ -3,7 +3,12 @@ const ROLES_LIST = require("../config/rolesList");
 const User = require("../model/User");
 const TimeLogs = require("../model/TimeLogs");
 
-const { startOfToday, endOfToday, differenceInHours } = require("date-fns");
+const {
+  startOfToday,
+  endOfToday,
+  differenceInHours,
+  endOfMonth,
+} = require("date-fns");
 
 const addUserLog = async (req, res) => {
   let targetUserId = req.user.id;
@@ -94,6 +99,58 @@ const addUserLog = async (req, res) => {
   }
 };
 
+const getUserLogs = async (req, res) => {
+  const { userId, year, month } = req.body;
+  const date = new Date(year, month);
+  const endDate = endOfMonth(date);
+  let targetUserId = req.user.id;
+  const adminOnly = req.user.roles.includes(ROLES_LIST.Admin);
+
+  if (adminOnly) {
+    targetUserId = userId;
+  }
+
+  const userLogs = await TimeLogs.aggregate([
+    {
+      $match: {
+        userId: new ObjectId(targetUserId),
+        date: {
+          $gte: date,
+          $lte: endDate,
+        },
+      },
+    },
+    {
+      $group: {
+        logs: { $push: "$$ROOT" },
+        _id: {
+          $dateToString: {
+            format: "%d",
+            date: "$date",
+            timezone: "Europe/Kiev",
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        day: { $toInt: "$_id" },
+        count: 1,
+        logs: 1,
+      },
+    },
+    {
+      $sort: {
+        day: 1,
+      },
+    },
+  ]);
+
+  res.json({ userLogs });
+};
+
 module.exports = {
   addUserLog,
+  getUserLogs,
 };

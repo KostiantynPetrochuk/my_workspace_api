@@ -66,7 +66,7 @@ const getAllUsers = async (req, res) => {
             },
           },
           {
-            $sort: { date: -1 },
+            $sort: { date: 1 },
           },
         ],
         as: "timelogsHistory",

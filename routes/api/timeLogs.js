@@ -8,4 +8,8 @@ router
   .route("/")
   .post(verifyRoles(ROLES_LIST.User), timeLogsController.addUserLog);
 
+router
+  .route("/getByUserId")
+  .post(verifyRoles(ROLES_LIST.User), timeLogsController.getUserLogs);
+
 module.exports = router;
