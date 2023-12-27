@@ -150,7 +150,48 @@ const getUserLogs = async (req, res) => {
   res.json({ userLogs });
 };
 
+const updateUserLog = async (req, res) => {
+  const { logId, time, logStatus } = req.body;
+  const currentLog = await TimeLogs.findOne({ _id: new ObjectId(logId) });
+
+  if (logStatus === "in" && currentLog.status === "out") {
+    const outTime = currentLog.entries.out.date;
+    const resultTime = differenceInHours(outTime, new Date(time));
+
+    const result = await TimeLogs.findOneAndUpdate(
+      { _id: new ObjectId(logId) },
+      {
+        $set: {
+          "entries.in.date": time,
+          hours: resultTime,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json(result);
+    return;
+  }
+  if (logStatus === "out") {
+    const inTime = currentLog.entries.in.date;
+    const resultTime = differenceInHours(new Date(time), inTime);
+
+    const result = await TimeLogs.findOneAndUpdate(
+      { _id: new ObjectId(logId) },
+      {
+        $set: {
+          "entries.out.date": time,
+          hours: resultTime,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json(result);
+    return;
+  }
+};
+
 module.exports = {
   addUserLog,
   getUserLogs,
+  updateUserLog,
 };
