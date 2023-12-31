@@ -7,7 +7,8 @@ const verifyRoles = require("../../middleware/verifyRoles");
 router
   .route("/")
   .post(verifyRoles(ROLES_LIST.User), timeLogsController.addUserLog)
-  .patch(verifyRoles(ROLES_LIST.Admin), timeLogsController.updateUserLog);
+  .patch(verifyRoles(ROLES_LIST.Admin), timeLogsController.updateUserLog)
+  .delete(verifyRoles(ROLES_LIST.Admin), timeLogsController.deleteUserLog);
 
 router
   .route("/getByUserId")

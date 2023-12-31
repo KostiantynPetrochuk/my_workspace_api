@@ -171,6 +171,19 @@ const updateUserLog = async (req, res) => {
     res.status(200).json(result);
     return;
   }
+  if (logStatus === "in" && currentLog.status === "in") {
+    const result = await TimeLogs.findOneAndUpdate(
+      { _id: new ObjectId(logId) },
+      {
+        $set: {
+          "entries.in.date": time,
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json(result);
+    return;
+  }
   if (logStatus === "out") {
     const inTime = currentLog.entries.in.date;
     const resultTime = differenceInHours(new Date(time), inTime);
@@ -190,8 +203,36 @@ const updateUserLog = async (req, res) => {
   }
 };
 
+const deleteUserLog = async (req, res) => {
+  const { logId, logStatus } = req.body;
+
+  if (logStatus === "in") {
+    await TimeLogs.deleteOne({ _id: new ObjectId(logId) });
+    res.status(200).json({ status: "success" });
+    return;
+  }
+  if (logStatus === "out") {
+    const result = await TimeLogs.findOneAndUpdate(
+      { _id: new ObjectId(logId) },
+      {
+        $unset: {
+          "entries.out": "",
+          hours: "",
+        },
+        $set: {
+          status: "in",
+        },
+      },
+      { new: true }
+    );
+    res.status(200).json({ status: "success", newLog: result });
+    return;
+  }
+};
+
 module.exports = {
   addUserLog,
   getUserLogs,
   updateUserLog,
+  deleteUserLog,
 };
